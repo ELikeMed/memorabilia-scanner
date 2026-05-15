@@ -24,23 +24,21 @@
   }
   header .stats span { color: #4fc3f7; font-weight: 600; }
 
-  /* Tabs */
   .tabs {
     display: flex; background: #111; border-bottom: 1px solid #333;
     position: sticky; top: 68px; z-index: 99;
   }
   .tab {
-    flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 600;
+    flex: 1; padding: 12px 4px; text-align: center; font-size: 13px; font-weight: 600;
     color: #666; border-bottom: 2px solid transparent; cursor: pointer;
     transition: all 0.2s;
   }
   .tab.active { color: #4fc3f7; border-bottom-color: #4fc3f7; }
 
-  /* Panels */
   .panel { display: none; padding: 16px; }
   .panel.active { display: block; }
 
-  /* Add Item Form */
+  /* Photo capture */
   .photo-capture {
     width: 100%; aspect-ratio: 4/3; background: #1a1a1a; border: 2px dashed #333;
     border-radius: 12px; display: flex; flex-direction: column;
@@ -54,7 +52,6 @@
   .photo-capture .placeholder svg { width: 48px; height: 48px; fill: #444; margin-bottom: 8px; }
   .photo-capture .placeholder p { font-size: 14px; }
   .photo-capture.has-photo .placeholder { display: none; }
-
   input[type="file"] { display: none; }
 
   .form-group { margin-bottom: 14px; }
@@ -64,14 +61,10 @@
     border-radius: 8px; color: #e0e0e0; font-size: 16px; outline: none;
     transition: border-color 0.2s;
   }
-  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-    border-color: #4fc3f7;
-  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #4fc3f7; }
   .form-group textarea { resize: vertical; min-height: 60px; }
 
-  .tags {
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag {
     padding: 8px 14px; background: #1a1a1a; border: 1px solid #333;
     border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s;
@@ -89,15 +82,15 @@
   .btn-secondary { background: #1a1a2e; color: #4fc3f7; border: 1px solid #4fc3f7; }
   .btn-danger { background: #2a1a1a; color: #f44; border: 1px solid #f44; }
   .btn-success { background: #1a2a1a; color: #4caf50; border: 1px solid #4caf50; }
+  .btn-warning { background: #2a2a1a; color: #ff9800; border: 1px solid #ff9800; }
+  .btn-sm { padding: 10px; font-size: 14px; }
 
   /* Item Cards */
   .item-card {
     background: #141414; border: 1px solid #222; border-radius: 12px;
     margin-bottom: 12px; overflow: hidden;
   }
-  .item-card-header {
-    display: flex; align-items: center; padding: 12px; gap: 12px;
-  }
+  .item-card-header { display: flex; align-items: center; padding: 12px; gap: 12px; }
   .item-card-thumb {
     width: 64px; height: 64px; border-radius: 8px; object-fit: cover;
     background: #1a1a1a; flex-shrink: 0;
@@ -106,18 +99,6 @@
   .item-card-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .item-card-info .item-category { font-size: 12px; color: #4fc3f7; }
   .item-card-info .item-desc { font-size: 12px; color: #777; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .item-card-actions {
-    display: flex; gap: 8px; padding: 0 12px 12px;
-  }
-  .item-card-actions button {
-    flex: 1; padding: 8px; border: 1px solid #333; background: #1a1a1a;
-    color: #aaa; border-radius: 6px; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .item-card-actions button:active { background: #222; }
-  .item-card-actions .ebay-btn { border-color: #e53935; color: #e53935; }
-  .item-card-actions .google-btn { border-color: #4caf50; color: #4caf50; }
-  .item-card-actions .delete-btn { border-color: #666; color: #666; }
 
   .item-value {
     padding: 4px 10px; background: #1a2a1a; color: #4caf50;
@@ -125,7 +106,37 @@
   }
   .item-value.no-value { background: #1a1a1a; color: #555; }
 
-  /* Export panel */
+  .item-estimate {
+    padding: 0 12px 8px; font-size: 12px;
+  }
+  .estimate-badge {
+    display: inline-block; padding: 3px 8px; background: #1a1a2e; border: 1px solid #4fc3f7;
+    border-radius: 4px; color: #4fc3f7; font-size: 11px; font-weight: 600;
+  }
+
+  .item-card-actions { display: flex; gap: 6px; padding: 0 12px 10px; flex-wrap: wrap; }
+  .item-card-actions button {
+    flex: 1; min-width: 0; padding: 8px 4px; border: 1px solid #333; background: #1a1a1a;
+    color: #aaa; border-radius: 6px; font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .item-card-actions button:active { background: #222; }
+  .item-card-actions .ebay-btn { border-color: #e53935; color: #e53935; }
+  .item-card-actions .google-btn { border-color: #4caf50; color: #4caf50; }
+  .item-card-actions .post-btn { border-color: #ff9800; color: #ff9800; }
+  .item-card-actions .delete-btn { border-color: #666; color: #666; }
+
+  .value-input-row { display: flex; gap: 8px; padding: 0 12px 10px; }
+  .value-input-row input {
+    flex: 1; padding: 8px 12px; background: #1a1a1a; border: 1px solid #333;
+    border-radius: 6px; color: #4caf50; font-size: 14px; outline: none;
+  }
+  .value-input-row button {
+    padding: 8px 16px; background: #1a2a1a; border: 1px solid #4caf50;
+    color: #4caf50; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+
+  /* Export */
   .export-section { margin-bottom: 20px; }
   .export-section h3 { font-size: 16px; margin-bottom: 10px; }
   .export-preview {
@@ -134,46 +145,117 @@
     max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
   }
 
-  /* Search bar */
-  .search-bar {
-    padding: 10px; background: #111; position: sticky; top: 110px; z-index: 98;
+  /* Category breakdown */
+  .cat-breakdown { margin-top: 12px; }
+  .cat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; background: #141414; border: 1px solid #222;
+    border-radius: 8px; margin-bottom: 6px;
   }
+  .cat-row .cat-name { font-size: 14px; font-weight: 600; }
+  .cat-row .cat-count { font-size: 12px; color: #888; }
+  .cat-row .cat-value { font-size: 14px; color: #4caf50; font-weight: 700; }
+  .cat-bar {
+    height: 4px; background: #222; border-radius: 2px; margin-top: 6px; overflow: hidden;
+  }
+  .cat-bar-fill { height: 100%; background: #4fc3f7; border-radius: 2px; transition: width 0.3s; }
+
+  /* Rapid fire mode */
+  .rapid-fire-overlay {
+    display: none; position: fixed; inset: 0; background: #0a0a0a; z-index: 300;
+    flex-direction: column;
+  }
+  .rapid-fire-overlay.active { display: flex; }
+  .rapid-fire-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; background: #111; border-bottom: 1px solid #333;
+  }
+  .rapid-fire-header h2 { font-size: 18px; color: #ff9800; }
+  .rapid-fire-header .rf-count { color: #4fc3f7; font-size: 14px; font-weight: 600; }
+  .rapid-fire-close {
+    padding: 8px 16px; background: transparent; border: 1px solid #666;
+    color: #ccc; border-radius: 6px; font-size: 14px; cursor: pointer;
+  }
+  .rapid-fire-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 20px; gap: 20px;
+  }
+  .rf-preview-area {
+    width: 100%; max-width: 400px; aspect-ratio: 4/3; background: #1a1a1a;
+    border: 2px dashed #ff9800; border-radius: 12px; overflow: hidden;
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .rf-preview-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; display: none; }
+  .rf-preview-area .rf-placeholder { text-align: center; color: #666; }
+  .rf-preview-area .rf-placeholder p { font-size: 16px; margin-top: 8px; }
+  .rf-quick-name {
+    width: 100%; max-width: 400px; padding: 14px; background: #1a1a1a;
+    border: 1px solid #333; border-radius: 8px; color: #e0e0e0;
+    font-size: 16px; outline: none; text-align: center;
+  }
+  .rf-quick-name:focus { border-color: #ff9800; }
+  .rf-quick-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 400px; }
+  .rf-quick-tags .tag { font-size: 12px; padding: 6px 12px; }
+  .rf-actions { display: flex; gap: 12px; width: 100%; max-width: 400px; }
+  .rf-actions .btn { flex: 1; }
+
+  .rf-saved-flash {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(76, 175, 80, 0.9); color: #fff; padding: 20px 40px;
+    border-radius: 12px; font-size: 20px; font-weight: 700; z-index: 400;
+    opacity: 0; transition: opacity 0.2s; pointer-events: none;
+  }
+  .rf-saved-flash.show { opacity: 1; }
+
+  /* Post modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 250; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-sheet {
+    background: #141414; border-top-left-radius: 20px; border-top-right-radius: 20px;
+    width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto;
+    padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  .modal-sheet h3 { font-size: 18px; margin-bottom: 4px; }
+  .modal-sheet .modal-subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
+  .modal-handle {
+    width: 40px; height: 4px; background: #444; border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .listing-preview {
+    background: #1a1a1a; border: 1px solid #333; border-radius: 8px;
+    padding: 14px; font-size: 13px; color: #ccc; margin-bottom: 16px;
+    white-space: pre-wrap; line-height: 1.5; max-height: 200px; overflow-y: auto;
+  }
+  .platform-buttons { display: flex; flex-direction: column; gap: 10px; }
+  .platform-btn {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    background: #1a1a1a; border: 1px solid #333; border-radius: 10px;
+    color: #e0e0e0; font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .platform-btn:active { background: #222; }
+  .platform-btn .platform-icon { font-size: 24px; width: 32px; text-align: center; }
+  .platform-btn .platform-name { flex: 1; }
+  .platform-btn .platform-arrow { color: #666; }
+  .platform-btn.ebay { border-color: #e53935; }
+  .platform-btn.facebook { border-color: #1877f2; }
+  .platform-btn.offerup { border-color: #00d26a; }
+  .platform-btn.mercari { border-color: #ff5757; }
+  .platform-btn.craigslist { border-color: #9b59b6; }
+
   .search-bar input {
     width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333;
     border-radius: 8px; color: #e0e0e0; font-size: 14px; outline: none;
   }
   .search-bar input:focus { border-color: #4fc3f7; }
 
-  .empty-state {
-    text-align: center; padding: 60px 20px; color: #444;
-  }
+  .empty-state { text-align: center; padding: 60px 20px; color: #444; }
   .empty-state svg { width: 64px; height: 64px; fill: #333; margin-bottom: 16px; }
   .empty-state p { font-size: 14px; }
 
-  /* Value input inline */
-  .value-input-row {
-    display: flex; gap: 8px; padding: 0 12px 12px;
-  }
-  .value-input-row input {
-    flex: 1; padding: 8px 12px; background: #1a1a1a; border: 1px solid #333;
-    border-radius: 6px; color: #4caf50; font-size: 14px; outline: none;
-  }
-  .value-input-row button {
-    padding: 8px 16px; background: #1a2a1a; border: 1px solid #4caf50;
-    color: #4caf50; border-radius: 6px; font-size: 12px; font-weight: 700;
-    cursor: pointer;
-  }
-
-  /* Quick add bottom bar */
-  .bottom-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: #111; border-top: 1px solid #333;
-    padding: 12px 16px; z-index: 100;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
-  .bottom-bar .btn { margin-top: 0; }
-
-  /* Toast */
   .toast {
     position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
     background: #4caf50; color: #fff; padding: 10px 20px; border-radius: 8px;
@@ -182,7 +264,6 @@
   }
   .toast.show { opacity: 1; }
 
-  /* Condition tags */
   .condition-tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .condition-tag {
     padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;
@@ -196,6 +277,30 @@
   .condition-tag[data-val="good"].selected { background: #2a2a1a; }
   .condition-tag[data-val="fair"] { border-color: #f44336; color: #f44336; background: transparent; }
   .condition-tag[data-val="fair"].selected { background: #2a1a1a; }
+
+  /* Estimate display on add form */
+  .auto-estimate-box {
+    background: #1a1a2e; border: 1px solid #4fc3f7; border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 14px; display: none;
+  }
+  .auto-estimate-box.visible { display: block; }
+  .auto-estimate-box .est-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .auto-estimate-box .est-range { font-size: 20px; font-weight: 700; color: #4fc3f7; }
+  .auto-estimate-box .est-suggest { font-size: 12px; color: #888; margin-top: 4px; }
+  .auto-estimate-box .est-use-btn {
+    margin-top: 8px; padding: 6px 14px; background: #4fc3f7; color: #000;
+    border: none; border-radius: 6px; font-size: 12px; font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Filter chips on items tab */
+  .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; overflow-x: auto; }
+  .filter-chip {
+    padding: 6px 12px; background: #1a1a1a; border: 1px solid #333;
+    border-radius: 16px; font-size: 12px; color: #888; cursor: pointer;
+    white-space: nowrap; user-select: none;
+  }
+  .filter-chip.active { background: #1a3a4a; border-color: #4fc3f7; color: #4fc3f7; }
 </style>
 </head>
 <body>
@@ -211,7 +316,9 @@
 
 <div class="tabs">
   <div class="tab active" data-tab="add" onclick="switchTab('add')">+ Add</div>
+  <div class="tab" data-tab="rapid" onclick="startRapidFire()">Rapid</div>
   <div class="tab" data-tab="items" onclick="switchTab('items')">Items</div>
+  <div class="tab" data-tab="stats" onclick="switchTab('stats')">Stats</div>
   <div class="tab" data-tab="export" onclick="switchTab('export')">Export</div>
 </div>
 
@@ -228,39 +335,47 @@
 
   <div class="form-group">
     <label>Item Name / Title</label>
-    <input type="text" id="itemName" placeholder="e.g. Miami Dolphins Dan Marino Jersey">
+    <input type="text" id="itemName" placeholder="e.g. Miami Dolphins Dan Marino Jersey" oninput="updateEstimate()">
   </div>
 
   <div class="form-group">
     <label>Category</label>
     <div class="tags" id="categoryTags">
-      <div class="tag" data-cat="Jersey" onclick="selectTag(this,'categoryTags')">Jersey</div>
-      <div class="tag" data-cat="Hat" onclick="selectTag(this,'categoryTags')">Hat</div>
-      <div class="tag" data-cat="T-Shirt" onclick="selectTag(this,'categoryTags')">T-Shirt</div>
-      <div class="tag" data-cat="Jacket" onclick="selectTag(this,'categoryTags')">Jacket</div>
-      <div class="tag" data-cat="Signed Item" onclick="selectTag(this,'categoryTags')">Signed</div>
-      <div class="tag" data-cat="Card" onclick="selectTag(this,'categoryTags')">Card</div>
-      <div class="tag" data-cat="Ball" onclick="selectTag(this,'categoryTags')">Ball</div>
-      <div class="tag" data-cat="Photo/Print" onclick="selectTag(this,'categoryTags')">Photo</div>
-      <div class="tag" data-cat="Pennant" onclick="selectTag(this,'categoryTags')">Pennant</div>
-      <div class="tag" data-cat="Shoes" onclick="selectTag(this,'categoryTags')">Shoes</div>
-      <div class="tag" data-cat="Other" onclick="selectTag(this,'categoryTags')">Other</div>
+      <div class="tag" data-cat="Jersey" onclick="selectTag(this,'categoryTags');updateEstimate()">Jersey</div>
+      <div class="tag" data-cat="Hat" onclick="selectTag(this,'categoryTags');updateEstimate()">Hat</div>
+      <div class="tag" data-cat="T-Shirt" onclick="selectTag(this,'categoryTags');updateEstimate()">T-Shirt</div>
+      <div class="tag" data-cat="Jacket" onclick="selectTag(this,'categoryTags');updateEstimate()">Jacket</div>
+      <div class="tag" data-cat="Signed Item" onclick="selectTag(this,'categoryTags');updateEstimate()">Signed</div>
+      <div class="tag" data-cat="Card" onclick="selectTag(this,'categoryTags');updateEstimate()">Card</div>
+      <div class="tag" data-cat="Ball" onclick="selectTag(this,'categoryTags');updateEstimate()">Ball</div>
+      <div class="tag" data-cat="Photo/Print" onclick="selectTag(this,'categoryTags');updateEstimate()">Photo</div>
+      <div class="tag" data-cat="Pennant" onclick="selectTag(this,'categoryTags');updateEstimate()">Pennant</div>
+      <div class="tag" data-cat="Shoes" onclick="selectTag(this,'categoryTags');updateEstimate()">Shoes</div>
+      <div class="tag" data-cat="Other" onclick="selectTag(this,'categoryTags');updateEstimate()">Other</div>
     </div>
   </div>
 
   <div class="form-group">
     <label>Condition</label>
     <div class="condition-tags" id="conditionTags">
-      <div class="condition-tag" data-val="mint" onclick="selectCondition(this)">Mint</div>
-      <div class="condition-tag" data-val="excellent" onclick="selectCondition(this)">Excellent</div>
-      <div class="condition-tag" data-val="good" onclick="selectCondition(this)">Good</div>
-      <div class="condition-tag" data-val="fair" onclick="selectCondition(this)">Fair</div>
+      <div class="condition-tag" data-val="mint" onclick="selectCondition(this);updateEstimate()">Mint</div>
+      <div class="condition-tag" data-val="excellent" onclick="selectCondition(this);updateEstimate()">Excellent</div>
+      <div class="condition-tag" data-val="good" onclick="selectCondition(this);updateEstimate()">Good</div>
+      <div class="condition-tag" data-val="fair" onclick="selectCondition(this);updateEstimate()">Fair</div>
     </div>
+  </div>
+
+  <!-- Auto Estimate Box -->
+  <div class="auto-estimate-box" id="autoEstimate">
+    <div class="est-label">Quick Estimate</div>
+    <div class="est-range" id="estRange">$25 - $75</div>
+    <div class="est-suggest" id="estSuggest">Suggested list price: $50</div>
+    <button class="est-use-btn" onclick="useEstimate()">Use Suggested Price</button>
   </div>
 
   <div class="form-group">
     <label>Sport / Team / Player</label>
-    <input type="text" id="itemTeam" placeholder="e.g. NFL / Dolphins / Marino">
+    <input type="text" id="itemTeam" placeholder="e.g. NFL / Dolphins / Marino" oninput="updateEstimate()">
   </div>
 
   <div class="form-group">
@@ -269,8 +384,8 @@
   </div>
 
   <div class="form-group">
-    <label>Estimated Value ($)</label>
-    <input type="number" id="itemValue" placeholder="Leave blank if unknown" inputmode="decimal">
+    <label>Your Price ($)</label>
+    <input type="number" id="itemValue" placeholder="Leave blank to use estimate" inputmode="decimal">
   </div>
 
   <button class="btn btn-primary" onclick="saveItem()">Save Item</button>
@@ -279,10 +394,28 @@
 
 <!-- ITEMS PANEL -->
 <div class="panel" id="panel-items">
-  <div class="search-bar" style="padding:0; margin-bottom:12px; position:static;">
-    <input type="text" id="searchInput" placeholder="Search items..." oninput="renderItems()">
+  <div style="margin-bottom:12px">
+    <input type="text" id="searchInput" placeholder="Search items..." oninput="renderItems()"
+      style="width:100%;padding:10px 14px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#e0e0e0;font-size:14px;outline:none">
   </div>
+  <div class="filter-chips" id="filterChips"></div>
   <div id="itemsList"></div>
+</div>
+
+<!-- STATS PANEL -->
+<div class="panel" id="panel-stats">
+  <div class="export-section">
+    <h3>Category Breakdown</h3>
+    <div class="cat-breakdown" id="catBreakdown"></div>
+  </div>
+  <div class="export-section" style="margin-top:20px">
+    <h3>Condition Breakdown</h3>
+    <div class="cat-breakdown" id="condBreakdown"></div>
+  </div>
+  <div class="export-section" style="margin-top:20px">
+    <h3>Inventory Overview</h3>
+    <div id="overviewStats" style="background:#141414; border:1px solid #222; border-radius:8px; padding:14px;"></div>
+  </div>
 </div>
 
 <!-- EXPORT PANEL -->
@@ -291,17 +424,62 @@
     <h3>Summary</h3>
     <div id="exportSummary" style="background:#1a1a1a; border:1px solid #333; border-radius:8px; padding:14px; margin-bottom:16px; font-size:14px; line-height:1.6;"></div>
   </div>
-
   <button class="btn btn-primary" onclick="exportCSV()">Download CSV</button>
   <button class="btn btn-secondary" onclick="copyList()" style="margin-top:8px">Copy List to Clipboard</button>
   <button class="btn btn-success" onclick="shareList()" style="margin-top:8px">Share List</button>
-
   <div class="export-section" style="margin-top:20px">
     <h3>CSV Preview</h3>
     <div class="export-preview" id="csvPreview"></div>
   </div>
-
   <button class="btn btn-danger" onclick="clearAll()" style="margin-top:20px">Clear All Items</button>
+</div>
+
+<!-- RAPID FIRE OVERLAY -->
+<div class="rapid-fire-overlay" id="rapidFireOverlay">
+  <div class="rapid-fire-header">
+    <h2>Rapid Fire Mode</h2>
+    <span class="rf-count" id="rfCount">0 snapped</span>
+    <button class="rapid-fire-close" onclick="closeRapidFire()">Done</button>
+  </div>
+  <div class="rapid-fire-body">
+    <div class="rf-preview-area" onclick="document.getElementById('rfCameraInput').click()">
+      <div class="rf-placeholder">
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="#ff9800"><path d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4z"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+        <p>Tap to snap</p>
+      </div>
+      <img id="rfPreview">
+    </div>
+    <input type="file" id="rfCameraInput" accept="image/*" capture="environment" onchange="handleRapidPhoto(this)">
+    <input type="text" class="rf-quick-name" id="rfItemName" placeholder="Quick name (optional - add later)">
+    <div class="rf-quick-tags" id="rfCategoryTags">
+      <div class="tag" data-cat="Jersey" onclick="selectTag(this,'rfCategoryTags')">Jersey</div>
+      <div class="tag" data-cat="Hat" onclick="selectTag(this,'rfCategoryTags')">Hat</div>
+      <div class="tag" data-cat="T-Shirt" onclick="selectTag(this,'rfCategoryTags')">T-Shirt</div>
+      <div class="tag" data-cat="Jacket" onclick="selectTag(this,'rfCategoryTags')">Jacket</div>
+      <div class="tag" data-cat="Signed Item" onclick="selectTag(this,'rfCategoryTags')">Signed</div>
+      <div class="tag" data-cat="Card" onclick="selectTag(this,'rfCategoryTags')">Card</div>
+      <div class="tag" data-cat="Ball" onclick="selectTag(this,'rfCategoryTags')">Ball</div>
+      <div class="tag" data-cat="Shoes" onclick="selectTag(this,'rfCategoryTags')">Shoes</div>
+      <div class="tag" data-cat="Other" onclick="selectTag(this,'rfCategoryTags')">Other</div>
+    </div>
+    <div class="rf-actions">
+      <button class="btn btn-warning" onclick="saveRapidItem()" id="rfSaveBtn" disabled>Save & Next</button>
+    </div>
+  </div>
+</div>
+<div class="rf-saved-flash" id="rfFlash">Saved!</div>
+
+<!-- POST / LISTING MODAL -->
+<div class="modal-overlay" id="postModal" onclick="if(event.target===this)closePostModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 id="postModalTitle">Post Item</h3>
+    <div class="modal-subtitle" id="postModalSubtitle">Listing generated - pick a platform</div>
+    <div class="listing-preview" id="listingPreview"></div>
+    <button class="btn btn-secondary btn-sm" onclick="copyListing()" style="margin-bottom:16px">Copy Listing Text</button>
+    <div class="platform-buttons" id="platformButtons"></div>
+    <button class="btn btn-secondary" onclick="closePostModal()" style="margin-top:12px">Close</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -309,6 +487,95 @@
 <script>
 const DB_KEY = 'memorabilia_items';
 
+// ========== PRICE ESTIMATE ENGINE ==========
+const PRICE_RANGES = {
+  'Jersey':       { base: [40, 150],  signed: [100, 500] },
+  'Hat':          { base: [10, 40],   signed: [30, 120] },
+  'T-Shirt':      { base: [10, 35],   signed: [40, 150] },
+  'Jacket':       { base: [30, 120],  signed: [80, 300] },
+  'Signed Item':  { base: [50, 250],  signed: [50, 250] },
+  'Card':         { base: [5, 50],    signed: [20, 200] },
+  'Ball':         { base: [15, 60],   signed: [50, 300] },
+  'Photo/Print':  { base: [10, 40],   signed: [30, 150] },
+  'Pennant':      { base: [10, 50],   signed: [25, 100] },
+  'Shoes':        { base: [30, 150],  signed: [80, 400] },
+  'Other':        { base: [10, 50],   signed: [25, 100] }
+};
+
+const CONDITION_MULT = { mint: 1.0, excellent: 0.8, good: 0.6, fair: 0.35 };
+
+// Players/teams that bump value up
+const HIGH_VALUE_KEYWORDS = [
+  'jordan','lebron','kobe','brady','montana','marino','jeter','ruth','mantle',
+  'gretzky','ali','tyson','tiger','woods','mahomes','shaq','bird','magic',
+  'griffey','trout','ohtani','messi','ronaldo','judge','iverson','rodman',
+  'super bowl','world series','championship','all-star','game worn','game used',
+  'rookie','vintage','retro','throwback','limited edition','authenticated','psa',
+  'beckett','jsa','hof','hall of fame','1990s','1980s','1970s','1960s'
+];
+
+function getEstimate(category, condition, nameAndTeam) {
+  if (!category) return null;
+  const ranges = PRICE_RANGES[category] || PRICE_RANGES['Other'];
+  const text = (nameAndTeam || '').toLowerCase();
+
+  // Check if signed
+  const isSigned = category === 'Signed Item' || /sign|auto|autograph/i.test(text);
+  let [low, high] = isSigned ? ranges.signed : ranges.base;
+
+  // Condition multiplier
+  const mult = CONDITION_MULT[condition] || 0.7;
+  low = Math.round(low * mult);
+  high = Math.round(high * mult);
+
+  // High-value keyword boost
+  let boost = 1.0;
+  let matchCount = 0;
+  HIGH_VALUE_KEYWORDS.forEach(kw => {
+    if (text.includes(kw)) { matchCount++; }
+  });
+  if (matchCount >= 3) boost = 2.5;
+  else if (matchCount >= 2) boost = 1.8;
+  else if (matchCount >= 1) boost = 1.3;
+
+  low = Math.round(low * boost);
+  high = Math.round(high * boost);
+
+  // Make sure low < high and round to nice numbers
+  low = Math.max(5, Math.round(low / 5) * 5);
+  high = Math.max(low + 10, Math.round(high / 5) * 5);
+
+  const mid = Math.round(((low + high) / 2) / 5) * 5;
+  return { low, high, mid };
+}
+
+function updateEstimate() {
+  const catEl = document.querySelector('#categoryTags .tag.selected');
+  const condEl = document.querySelector('#conditionTags .condition-tag.selected');
+  const name = document.getElementById('itemName').value;
+  const team = document.getElementById('itemTeam').value;
+  const box = document.getElementById('autoEstimate');
+
+  if (!catEl) { box.classList.remove('visible'); return; }
+
+  const est = getEstimate(catEl.dataset.cat, condEl ? condEl.dataset.val : '', name + ' ' + team);
+  if (!est) { box.classList.remove('visible'); return; }
+
+  document.getElementById('estRange').textContent = `$${est.low} - $${est.high}`;
+  document.getElementById('estSuggest').textContent = `Suggested list price: $${est.mid}`;
+  box.classList.add('visible');
+}
+
+function useEstimate() {
+  const rangeText = document.getElementById('estRange').textContent;
+  const match = rangeText.match(/\$(\d+)\s*-\s*\$(\d+)/);
+  if (match) {
+    const mid = Math.round((parseInt(match[1]) + parseInt(match[2])) / 2 / 5) * 5;
+    document.getElementById('itemValue').value = mid;
+  }
+}
+
+// ========== CORE DATA ==========
 function getItems() {
   try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
   catch { return []; }
@@ -327,22 +594,20 @@ function updateStats() {
   document.getElementById('totalValue').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
 }
 
-// Tabs
+// ========== TABS ==========
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
-  if (tab === 'items') renderItems();
+  if (tab === 'items') { renderFilterChips(); renderItems(); }
+  if (tab === 'stats') renderStats();
   if (tab === 'export') renderExport();
 }
 
-// Photo
+// ========== PHOTO ==========
 let currentPhoto = null;
-function handlePhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
+function processPhoto(file, callback) {
   const reader = new FileReader();
   reader.onload = (e) => {
-    // Resize to save localStorage space
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -351,17 +616,25 @@ function handlePhoto(input) {
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      currentPhoto = canvas.toDataURL('image/jpeg', 0.7);
-      document.getElementById('photoPreview').src = currentPhoto;
-      document.getElementById('photoPreview').style.display = 'block';
-      document.getElementById('photoCapture').classList.add('has-photo');
+      callback(canvas.toDataURL('image/jpeg', 0.7));
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-// Tags
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  processPhoto(file, (dataUrl) => {
+    currentPhoto = dataUrl;
+    document.getElementById('photoPreview').src = currentPhoto;
+    document.getElementById('photoPreview').style.display = 'block';
+    document.getElementById('photoCapture').classList.add('has-photo');
+  });
+}
+
+// ========== TAGS ==========
 function selectTag(el, groupId) {
   document.querySelectorAll('#' + groupId + ' .tag').forEach(t => t.classList.remove('selected'));
   el.classList.add('selected');
@@ -371,31 +644,34 @@ function selectCondition(el) {
   el.classList.add('selected');
 }
 
-// Save
+// ========== SAVE ITEM ==========
 function saveItem() {
   const name = document.getElementById('itemName').value.trim();
   if (!name) { showToast('Enter an item name'); return; }
 
   const catEl = document.querySelector('#categoryTags .tag.selected');
   const condEl = document.querySelector('#conditionTags .condition-tag.selected');
+  const cat = catEl ? catEl.dataset.cat : '';
+  const cond = condEl ? condEl.dataset.val : '';
+  const team = document.getElementById('itemTeam').value.trim();
+  let value = parseFloat(document.getElementById('itemValue').value) || 0;
+
+  // If no value set, use estimate mid
+  const est = getEstimate(cat, cond, name + ' ' + team);
+  if (value === 0 && est) value = est.mid;
 
   const item = {
-    id: Date.now(),
-    name: name,
-    category: catEl ? catEl.dataset.cat : '',
-    condition: condEl ? condEl.dataset.val : '',
-    team: document.getElementById('itemTeam').value.trim(),
-    notes: document.getElementById('itemNotes').value.trim(),
-    value: parseFloat(document.getElementById('itemValue').value) || 0,
-    photo: currentPhoto || '',
-    created: new Date().toISOString()
+    id: Date.now(), name, category: cat, condition: cond,
+    team, notes: document.getElementById('itemNotes').value.trim(),
+    value, photo: currentPhoto || '',
+    estimate: est, created: new Date().toISOString()
   };
 
   const items = getItems();
   items.unshift(item);
   saveItems(items);
   clearForm();
-  showToast('Item saved!');
+  showToast('Item saved! Est: $' + (est ? est.low + '-' + est.high : '?'));
 }
 
 function clearForm() {
@@ -407,31 +683,131 @@ function clearForm() {
   document.getElementById('photoCapture').classList.remove('has-photo');
   document.getElementById('cameraInput').value = '';
   currentPhoto = null;
-  document.querySelectorAll('.tag.selected, .condition-tag.selected').forEach(t => t.classList.remove('selected'));
+  document.querySelectorAll('#categoryTags .tag.selected, #conditionTags .condition-tag.selected').forEach(t => t.classList.remove('selected'));
+  document.getElementById('autoEstimate').classList.remove('visible');
   document.getElementById('itemName').focus();
 }
 
-// Render items
+// ========== RAPID FIRE MODE ==========
+let rfPhoto = null;
+let rfSessionCount = 0;
+
+function startRapidFire() {
+  rfSessionCount = 0;
+  document.getElementById('rfCount').textContent = '0 snapped';
+  document.getElementById('rapidFireOverlay').classList.add('active');
+  resetRapidForm();
+}
+
+function closeRapidFire() {
+  document.getElementById('rapidFireOverlay').classList.remove('active');
+  switchTab('items');
+  showToast(rfSessionCount + ' items added!');
+}
+
+function resetRapidForm() {
+  rfPhoto = null;
+  document.getElementById('rfPreview').style.display = 'none';
+  document.getElementById('rfItemName').value = '';
+  document.getElementById('rfSaveBtn').disabled = true;
+  document.querySelectorAll('#rfCategoryTags .tag').forEach(t => t.classList.remove('selected'));
+  document.getElementById('rfCameraInput').value = '';
+}
+
+function handleRapidPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  processPhoto(file, (dataUrl) => {
+    rfPhoto = dataUrl;
+    const prev = document.getElementById('rfPreview');
+    prev.src = dataUrl;
+    prev.style.display = 'block';
+    document.getElementById('rfSaveBtn').disabled = false;
+  });
+}
+
+function saveRapidItem() {
+  if (!rfPhoto) return;
+  const name = document.getElementById('rfItemName').value.trim() || 'Unnamed Item #' + (getItems().length + 1);
+  const catEl = document.querySelector('#rfCategoryTags .tag.selected');
+  const cat = catEl ? catEl.dataset.cat : '';
+  const est = getEstimate(cat, '', name);
+
+  const item = {
+    id: Date.now(), name, category: cat, condition: '',
+    team: '', notes: 'Added via Rapid Fire',
+    value: est ? est.mid : 0, photo: rfPhoto,
+    estimate: est, created: new Date().toISOString()
+  };
+
+  const items = getItems();
+  items.unshift(item);
+  saveItems(items);
+
+  rfSessionCount++;
+  document.getElementById('rfCount').textContent = rfSessionCount + ' snapped';
+
+  // Flash feedback
+  const flash = document.getElementById('rfFlash');
+  flash.classList.add('show');
+  setTimeout(() => flash.classList.remove('show'), 600);
+
+  // Reset for next item
+  resetRapidForm();
+  // Auto-open camera again
+  setTimeout(() => document.getElementById('rfCameraInput').click(), 700);
+}
+
+// ========== FILTER & RENDER ITEMS ==========
+let activeFilter = '';
+
+function renderFilterChips() {
+  const items = getItems();
+  const cats = {};
+  items.forEach(i => { const c = i.category || 'Uncategorized'; cats[c] = (cats[c] || 0) + 1; });
+
+  const container = document.getElementById('filterChips');
+  container.innerHTML = `<div class="filter-chip ${activeFilter === '' ? 'active' : ''}" onclick="setFilter('')">All (${items.length})</div>` +
+    Object.entries(cats).sort((a,b) => b[1]-a[1]).map(([cat, count]) =>
+      `<div class="filter-chip ${activeFilter === cat ? 'active' : ''}" onclick="setFilter('${cat}')">${cat} (${count})</div>`
+    ).join('');
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  renderFilterChips();
+  renderItems();
+}
+
 function renderItems() {
   const items = getItems();
   const search = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = search ? items.filter(i =>
-    i.name.toLowerCase().includes(search) ||
-    i.category.toLowerCase().includes(search) ||
-    i.team.toLowerCase().includes(search) ||
-    i.notes.toLowerCase().includes(search)
-  ) : items;
+  let filtered = items;
+
+  if (activeFilter) {
+    filtered = filtered.filter(i => (i.category || 'Uncategorized') === activeFilter);
+  }
+  if (search) {
+    filtered = filtered.filter(i =>
+      i.name.toLowerCase().includes(search) ||
+      i.category.toLowerCase().includes(search) ||
+      (i.team || '').toLowerCase().includes(search) ||
+      (i.notes || '').toLowerCase().includes(search)
+    );
+  }
 
   const container = document.getElementById('itemsList');
   if (filtered.length === 0) {
     container.innerHTML = `<div class="empty-state">
-      <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4z"/></svg>
-      <p>${search ? 'No items match your search' : 'No items yet. Start adding!'}</p>
+      <svg viewBox="0 0 24 24"><path fill="#333" d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4z"/></svg>
+      <p>${search || activeFilter ? 'No items match' : 'No items yet. Start adding!'}</p>
     </div>`;
     return;
   }
 
-  container.innerHTML = filtered.map(item => `
+  container.innerHTML = filtered.map(item => {
+    const est = item.estimate || getEstimate(item.category, item.condition, item.name + ' ' + (item.team||''));
+    return `
     <div class="item-card" data-id="${item.id}">
       <div class="item-card-header">
         ${item.photo
@@ -447,30 +823,31 @@ function renderItems() {
           ${item.value > 0 ? '$' + item.value.toLocaleString() : '?'}
         </div>
       </div>
+      ${est ? `<div class="item-estimate"><span class="estimate-badge">Est: $${est.low} - $${est.high}</span></div>` : ''}
       ${item.notes ? `<div style="padding:0 12px 8px; font-size:12px; color:#666">${esc(item.notes)}</div>` : ''}
       <div class="value-input-row">
         <input type="number" inputmode="decimal" placeholder="Set value $" id="val-${item.id}" value="${item.value || ''}" />
         <button onclick="updateValue(${item.id})">Set $</button>
       </div>
       <div class="item-card-actions">
-        <button class="ebay-btn" onclick="searchEbay('${escAttr(item.name)}')">eBay Sold</button>
+        <button class="ebay-btn" onclick="searchEbay('${escAttr(item.name)}')">eBay</button>
         <button class="google-btn" onclick="searchGoogle('${escAttr(item.name)}')">Google</button>
-        <button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button>
+        <button class="post-btn" onclick="openPostModal(${item.id})">Post</button>
+        <button class="delete-btn" onclick="deleteItem(${item.id})">Del</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function getCategoryEmoji(cat) {
-  const map = { 'Jersey': '👕', 'Hat': '🧢', 'T-Shirt': '👕', 'Jacket': '🧥', 'Signed Item': '✍️', 'Card': '🃏', 'Ball': '⚾', 'Photo/Print': '🖼️', 'Pennant': '🚩', 'Shoes': '👟', 'Other': '📦' };
+  const map = { 'Jersey':'👕','Hat':'🧢','T-Shirt':'👕','Jacket':'🧥','Signed Item':'✍️','Card':'🃏','Ball':'⚾','Photo/Print':'🖼️','Pennant':'🚩','Shoes':'👟','Other':'📦' };
   return map[cat] || '📦';
 }
-
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function escAttr(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-// Actions
+// ========== ACTIONS ==========
 function searchEbay(query) {
   window.open('https://www.ebay.com/sch/i.html?_nkw=' + encodeURIComponent(query) + '&LH_Complete=1&LH_Sold=1&_sop=13', '_blank');
 }
@@ -491,10 +868,171 @@ function deleteItem(id) {
   const items = getItems().filter(i => i.id !== id);
   saveItems(items);
   renderItems();
+  renderFilterChips();
   showToast('Item deleted');
 }
 
-// Export
+// ========== LISTING GENERATOR & MULTI-POST ==========
+function generateListing(item) {
+  const condMap = { mint: 'Mint/New', excellent: 'Excellent', good: 'Good', fair: 'Fair - see photos' };
+  const cond = condMap[item.condition] || 'See photos for condition';
+  const lines = [];
+  lines.push(item.name);
+  lines.push('');
+  if (item.category) lines.push('Type: ' + item.category);
+  if (item.team) lines.push('Sport/Team/Player: ' + item.team);
+  lines.push('Condition: ' + cond);
+  if (item.notes) lines.push('\n' + item.notes);
+  lines.push('');
+  lines.push('Price: $' + (item.value || 'Make an offer'));
+  lines.push('');
+  lines.push('Ships fast! Message with any questions.');
+  return lines.join('\n');
+}
+
+let currentPostItem = null;
+
+function openPostModal(id) {
+  const items = getItems();
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  currentPostItem = item;
+
+  const listing = generateListing(item);
+  document.getElementById('postModalTitle').textContent = 'Post: ' + item.name;
+  document.getElementById('postModalSubtitle').textContent = item.value ? 'Listed at $' + item.value : 'No price set';
+  document.getElementById('listingPreview').textContent = listing;
+
+  const encodedTitle = encodeURIComponent(item.name);
+  const encodedListing = encodeURIComponent(listing);
+  const price = item.value || '';
+
+  document.getElementById('platformButtons').innerHTML = `
+    <a class="platform-btn ebay" href="https://www.ebay.com/sl/sell?mode=AddItem&title=${encodedTitle}" target="_blank">
+      <span class="platform-icon">🏷️</span>
+      <span class="platform-name">eBay<br><small style="color:#888;font-weight:400">Create listing</small></span>
+      <span class="platform-arrow">→</span>
+    </a>
+    <a class="platform-btn facebook" href="https://www.facebook.com/marketplace/create/item/?title=${encodedTitle}&price=${price}" target="_blank">
+      <span class="platform-icon">📘</span>
+      <span class="platform-name">Facebook Marketplace<br><small style="color:#888;font-weight:400">Create listing</small></span>
+      <span class="platform-arrow">→</span>
+    </a>
+    <a class="platform-btn offerup" href="https://offerup.com/post" target="_blank">
+      <span class="platform-icon">🟢</span>
+      <span class="platform-name">OfferUp<br><small style="color:#888;font-weight:400">Listing text copied</small></span>
+      <span class="platform-arrow">→</span>
+    </a>
+    <a class="platform-btn mercari" href="https://www.mercari.com/sell/" target="_blank">
+      <span class="platform-icon">🔴</span>
+      <span class="platform-name">Mercari<br><small style="color:#888;font-weight:400">Listing text copied</small></span>
+      <span class="platform-arrow">→</span>
+    </a>
+    <a class="platform-btn craigslist" href="https://post.craigslist.org/" target="_blank">
+      <span class="platform-icon">🟣</span>
+      <span class="platform-name">Craigslist<br><small style="color:#888;font-weight:400">Listing text copied</small></span>
+      <span class="platform-arrow">→</span>
+    </a>
+  `;
+
+  document.getElementById('postModal').classList.add('active');
+}
+
+function closePostModal() {
+  document.getElementById('postModal').classList.remove('active');
+  currentPostItem = null;
+}
+
+function copyListing() {
+  const text = document.getElementById('listingPreview').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Listing copied!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Listing copied!');
+  });
+}
+
+// Auto-copy listing when clicking platform buttons
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.platform-btn');
+  if (btn && currentPostItem) {
+    const listing = generateListing(currentPostItem);
+    navigator.clipboard.writeText(listing).catch(() => {});
+  }
+});
+
+// ========== STATS PANEL ==========
+function renderStats() {
+  const items = getItems();
+
+  // Category breakdown
+  const cats = {};
+  items.forEach(i => {
+    const c = i.category || 'Uncategorized';
+    if (!cats[c]) cats[c] = { count: 0, value: 0 };
+    cats[c].count++;
+    cats[c].value += (i.value || 0);
+  });
+
+  const maxCount = Math.max(...Object.values(cats).map(c => c.count), 1);
+  const catHTML = Object.entries(cats)
+    .sort((a, b) => b[1].count - a[1].count)
+    .map(([cat, data]) => `
+      <div class="cat-row">
+        <div>
+          <div class="cat-name">${getCategoryEmoji(cat)} ${cat}</div>
+          <div class="cat-count">${data.count} item${data.count !== 1 ? 's' : ''}</div>
+          <div class="cat-bar" style="width:120px"><div class="cat-bar-fill" style="width:${(data.count/maxCount)*100}%"></div></div>
+        </div>
+        <div class="cat-value">${data.value > 0 ? '$' + data.value.toLocaleString() : '-'}</div>
+      </div>
+    `).join('');
+  document.getElementById('catBreakdown').innerHTML = catHTML || '<p style="color:#555">No items yet</p>';
+
+  // Condition breakdown
+  const conds = {};
+  items.forEach(i => {
+    const c = i.condition ? capitalize(i.condition) : 'Unset';
+    if (!conds[c]) conds[c] = { count: 0, value: 0 };
+    conds[c].count++;
+    conds[c].value += (i.value || 0);
+  });
+  const maxCond = Math.max(...Object.values(conds).map(c => c.count), 1);
+  const condHTML = Object.entries(conds)
+    .sort((a, b) => b[1].count - a[1].count)
+    .map(([cond, data]) => `
+      <div class="cat-row">
+        <div>
+          <div class="cat-name">${cond}</div>
+          <div class="cat-count">${data.count} item${data.count !== 1 ? 's' : ''}</div>
+          <div class="cat-bar" style="width:120px"><div class="cat-bar-fill" style="width:${(data.count/maxCond)*100}%"></div></div>
+        </div>
+        <div class="cat-value">${data.value > 0 ? '$' + data.value.toLocaleString() : '-'}</div>
+      </div>
+    `).join('');
+  document.getElementById('condBreakdown').innerHTML = condHTML || '<p style="color:#555">No items yet</p>';
+
+  // Overview
+  const valued = items.filter(i => i.value > 0);
+  const total = valued.reduce((s, i) => s + i.value, 0);
+  const avg = valued.length ? Math.round(total / valued.length) : 0;
+  const highest = valued.length ? Math.max(...valued.map(i => i.value)) : 0;
+  const needsValue = items.filter(i => !i.value).length;
+
+  document.getElementById('overviewStats').innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:14px">
+      <div>Total Items<br><strong style="font-size:24px;color:#4fc3f7">${items.length}</strong></div>
+      <div>Est. Total Value<br><strong style="font-size:24px;color:#4caf50">$${total.toLocaleString()}</strong></div>
+      <div>Avg Value<br><strong style="font-size:20px;color:#e0e0e0">$${avg.toLocaleString()}</strong></div>
+      <div>Highest Item<br><strong style="font-size:20px;color:#ff9800">$${highest.toLocaleString()}</strong></div>
+      <div>Items Valued<br><strong style="color:#4caf50">${valued.length}</strong></div>
+      <div>Needs Pricing<br><strong style="color:${needsValue > 0 ? '#f44' : '#4caf50'}">${needsValue}</strong></div>
+    </div>
+  `;
+}
+
+// ========== EXPORT ==========
 function renderExport() {
   const items = getItems();
   const valued = items.filter(i => i.value > 0);
@@ -510,30 +1048,28 @@ function renderExport() {
       ${Object.entries(cats).map(([k,v]) => `${k}: ${v}`).join('<br>')}
     </div>
   `;
-
-  const csv = generateCSV(items);
-  document.getElementById('csvPreview').textContent = csv;
+  document.getElementById('csvPreview').textContent = generateCSV(items);
 }
 
 function generateCSV(items) {
-  const headers = ['Name','Category','Condition','Sport/Team/Player','Notes','Value','Date Added'];
-  const rows = items.map(i => [
-    `"${i.name.replace(/"/g,'""')}"`,
-    i.category,
-    i.condition,
-    `"${(i.team||'').replace(/"/g,'""')}"`,
-    `"${(i.notes||'').replace(/"/g,'""')}"`,
-    i.value || '',
-    new Date(i.created).toLocaleDateString()
-  ].join(','));
+  const headers = ['Name','Category','Condition','Sport/Team/Player','Notes','Value','Est Low','Est High','Date Added'];
+  const rows = items.map(i => {
+    const est = i.estimate || getEstimate(i.category, i.condition, i.name + ' ' + (i.team||''));
+    return [
+      `"${i.name.replace(/"/g,'""')}"`, i.category, i.condition,
+      `"${(i.team||'').replace(/"/g,'""')}"`,
+      `"${(i.notes||'').replace(/"/g,'""')}"`,
+      i.value || '', est ? est.low : '', est ? est.high : '',
+      new Date(i.created).toLocaleDateString()
+    ].join(',');
+  });
   return [headers.join(','), ...rows].join('\n');
 }
 
 function exportCSV() {
   const items = getItems();
   if (!items.length) { showToast('No items to export'); return; }
-  const csv = generateCSV(items);
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const blob = new Blob([generateCSV(items)], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'memorabilia_' + new Date().toISOString().slice(0,10) + '.csv';
@@ -545,10 +1081,9 @@ function copyList() {
   const items = getItems();
   if (!items.length) { showToast('No items'); return; }
   const text = items.map((i,n) =>
-    `${n+1}. ${i.name}${i.category ? ' ['+i.category+']' : ''}${i.condition ? ' ('+i.condition+')' : ''}${i.value ? ' - $'+i.value : ''}${i.team ? ' | '+i.team : ''}${i.notes ? ' | '+i.notes : ''}`
+    `${n+1}. ${i.name}${i.category ? ' ['+i.category+']' : ''}${i.condition ? ' ('+i.condition+')' : ''}${i.value ? ' - $'+i.value : ''}${i.team ? ' | '+i.team : ''}`
   ).join('\n');
   navigator.clipboard.writeText(text).then(() => showToast('Copied!')).catch(() => {
-    // Fallback
     const ta = document.createElement('textarea');
     ta.value = text; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
@@ -559,14 +1094,12 @@ function copyList() {
 function shareList() {
   const items = getItems();
   if (!items.length) { showToast('No items'); return; }
+  const total = items.filter(i=>i.value>0).reduce((s,i)=>s+i.value,0);
   const text = 'Memorabilia Inventory\n' + new Date().toLocaleDateString() + '\n\n' +
-    items.map((i,n) =>
-      `${n+1}. ${i.name}${i.category ? ' ['+i.category+']' : ''}${i.value ? ' - $'+i.value : ''}`
-    ).join('\n') +
-    '\n\nTotal: $' + items.filter(i=>i.value>0).reduce((s,i)=>s+i.value,0).toLocaleString();
-
+    items.map((i,n) => `${n+1}. ${i.name}${i.category ? ' ['+i.category+']' : ''}${i.value ? ' - $'+i.value : ''}`).join('\n') +
+    '\n\nTotal: $' + total.toLocaleString();
   if (navigator.share) {
-    navigator.share({ title: 'Memorabilia Inventory', text: text });
+    navigator.share({ title: 'Memorabilia Inventory', text });
   } else {
     navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
   }
