@@ -301,6 +301,63 @@
     white-space: nowrap; user-select: none;
   }
   .filter-chip.active { background: #1a3a4a; border-color: #4fc3f7; color: #4fc3f7; }
+
+  /* Post steps */
+  .post-steps {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 16px; padding: 12px; background: #1a1a1a; border-radius: 8px;
+  }
+  .post-step {
+    display: flex; align-items: center; gap: 6px; opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+  .post-step.active { opacity: 1; }
+  .post-step.done { opacity: 0.7; }
+  .post-step .step-num {
+    width: 22px; height: 22px; background: #333; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #888;
+  }
+  .post-step.active .step-num { background: #4fc3f7; color: #000; }
+  .post-step.done .step-num { background: #4caf50; color: #fff; }
+  .post-step .step-text { font-size: 11px; color: #888; }
+  .post-step.active .step-text { color: #e0e0e0; }
+  .step-arrow { color: #444; font-size: 12px; }
+
+  /* Copy fields */
+  .copy-fields { margin-bottom: 16px; }
+  .copy-field {
+    display: flex; align-items: center; gap: 10px; padding: 12px;
+    background: #1a1a1a; border: 1px solid #333; border-radius: 8px;
+    margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+  }
+  .copy-field:active { background: #222; }
+  .copy-field-label {
+    font-size: 10px; font-weight: 700; color: #666; letter-spacing: 0.5px;
+    min-width: 60px;
+  }
+  .copy-field-value {
+    flex: 1; font-size: 13px; color: #ccc; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .copy-field-btn {
+    padding: 4px 10px; background: #1a1a2e; border: 1px solid #4fc3f7;
+    border-radius: 4px; font-size: 10px; font-weight: 700; color: #4fc3f7;
+    white-space: nowrap; transition: all 0.2s;
+  }
+  .copy-field-btn.copied { background: #1a2a1a; border-color: #4caf50; color: #4caf50; }
+
+  /* Paste reminder */
+  .paste-reminder {
+    display: none; padding: 12px; background: #1a2a1a; border: 1px solid #4caf50;
+    border-radius: 8px; color: #4caf50; font-size: 13px; font-weight: 600;
+    text-align: center; margin-top: 12px; animation: pulse-border 1.5s infinite;
+  }
+  .paste-reminder.show { display: block; }
+  @keyframes pulse-border {
+    0%, 100% { border-color: #4caf50; }
+    50% { border-color: #81c784; }
+  }
 </style>
 </head>
 <body>
@@ -475,9 +532,51 @@
     <div class="modal-handle"></div>
     <h3 id="postModalTitle">Post Item</h3>
     <div class="modal-subtitle" id="postModalSubtitle">Listing generated - pick a platform</div>
-    <div class="listing-preview" id="listingPreview"></div>
-    <button class="btn btn-secondary btn-sm" onclick="copyListing()" style="margin-bottom:16px">Copy Listing Text</button>
+
+    <!-- Step indicator -->
+    <div class="post-steps" id="postSteps">
+      <div class="post-step active" id="postStep1">
+        <div class="step-num">1</div>
+        <div class="step-text">Title copied</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="post-step" id="postStep2">
+        <div class="step-num">2</div>
+        <div class="step-text">Pick platform</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="post-step" id="postStep3">
+        <div class="step-num">3</div>
+        <div class="step-text">Paste & post</div>
+      </div>
+    </div>
+
+    <!-- Copy buttons for each field -->
+    <div class="copy-fields" id="copyFields">
+      <div class="copy-field" onclick="copyField('title')">
+        <div class="copy-field-label">TITLE</div>
+        <div class="copy-field-value" id="copyTitle"></div>
+        <div class="copy-field-btn" id="copyTitleBtn">TAP TO COPY</div>
+      </div>
+      <div class="copy-field" onclick="copyField('price')">
+        <div class="copy-field-label">PRICE</div>
+        <div class="copy-field-value" id="copyPrice"></div>
+        <div class="copy-field-btn" id="copyPriceBtn">TAP TO COPY</div>
+      </div>
+      <div class="copy-field" onclick="copyField('description')">
+        <div class="copy-field-label">DESCRIPTION</div>
+        <div class="copy-field-value" id="copyDesc" style="max-height:60px;overflow:hidden"></div>
+        <div class="copy-field-btn" id="copyDescBtn">TAP TO COPY</div>
+      </div>
+    </div>
+
     <div class="platform-buttons" id="platformButtons"></div>
+
+    <!-- Paste reminder banner -->
+    <div class="paste-reminder" id="pasteReminder">
+      Listing info copied! Paste it in the app.
+    </div>
+
     <button class="btn btn-secondary" onclick="closePostModal()" style="margin-top:12px">Close</button>
   </div>
 </div>
@@ -891,48 +990,67 @@ function generateListing(item) {
 }
 
 let currentPostItem = null;
+let currentListing = '';
 
 function openPostModal(id) {
   const items = getItems();
   const item = items.find(i => i.id === id);
   if (!item) return;
   currentPostItem = item;
+  currentListing = generateListing(item);
 
-  const listing = generateListing(item);
   document.getElementById('postModalTitle').textContent = 'Post: ' + item.name;
   document.getElementById('postModalSubtitle').textContent = item.value ? 'Listed at $' + item.value : 'No price set';
-  document.getElementById('listingPreview').textContent = listing;
 
+  // Fill copy fields
+  document.getElementById('copyTitle').textContent = item.name;
+  document.getElementById('copyPrice').textContent = item.value ? '$' + item.value : 'No price set';
+  document.getElementById('copyDesc').textContent = currentListing;
+
+  // Reset copy button states
+  document.querySelectorAll('.copy-field-btn').forEach(b => {
+    b.classList.remove('copied');
+    b.textContent = 'TAP TO COPY';
+  });
+
+  // Reset steps
+  document.querySelectorAll('.post-step').forEach((s, i) => {
+    s.classList.toggle('active', i === 0);
+    s.classList.remove('done');
+  });
+  document.getElementById('pasteReminder').classList.remove('show');
+
+  // Build platform buttons with deep links
+  // On mobile, these try to open the native app first, fall back to web
   const encodedTitle = encodeURIComponent(item.name);
-  const encodedListing = encodeURIComponent(listing);
   const price = item.value || '';
 
   document.getElementById('platformButtons').innerHTML = `
-    <a class="platform-btn ebay" href="https://www.ebay.com/sl/sell?mode=AddItem&title=${encodedTitle}" target="_blank">
+    <div class="platform-btn ebay" onclick="launchPlatform('ebay')">
       <span class="platform-icon">🏷️</span>
-      <span class="platform-name">eBay<br><small style="color:#888;font-weight:400">Create listing</small></span>
+      <span class="platform-name">eBay<br><small style="color:#888;font-weight:400">Opens app → Create Listing</small></span>
       <span class="platform-arrow">→</span>
-    </a>
-    <a class="platform-btn facebook" href="https://www.facebook.com/marketplace/create/item/?title=${encodedTitle}&price=${price}" target="_blank">
+    </div>
+    <div class="platform-btn facebook" onclick="launchPlatform('facebook')">
       <span class="platform-icon">📘</span>
-      <span class="platform-name">Facebook Marketplace<br><small style="color:#888;font-weight:400">Create listing</small></span>
+      <span class="platform-name">Facebook Marketplace<br><small style="color:#888;font-weight:400">Opens app → Sell tab</small></span>
       <span class="platform-arrow">→</span>
-    </a>
-    <a class="platform-btn offerup" href="https://offerup.com/post" target="_blank">
+    </div>
+    <div class="platform-btn offerup" onclick="launchPlatform('offerup')">
       <span class="platform-icon">🟢</span>
-      <span class="platform-name">OfferUp<br><small style="color:#888;font-weight:400">Listing text copied</small></span>
+      <span class="platform-name">OfferUp<br><small style="color:#888;font-weight:400">Opens app → Post item</small></span>
       <span class="platform-arrow">→</span>
-    </a>
-    <a class="platform-btn mercari" href="https://www.mercari.com/sell/" target="_blank">
+    </div>
+    <div class="platform-btn mercari" onclick="launchPlatform('mercari')">
       <span class="platform-icon">🔴</span>
-      <span class="platform-name">Mercari<br><small style="color:#888;font-weight:400">Listing text copied</small></span>
+      <span class="platform-name">Mercari<br><small style="color:#888;font-weight:400">Opens app → Sell</small></span>
       <span class="platform-arrow">→</span>
-    </a>
-    <a class="platform-btn craigslist" href="https://post.craigslist.org/" target="_blank">
+    </div>
+    <div class="platform-btn craigslist" onclick="launchPlatform('craigslist')">
       <span class="platform-icon">🟣</span>
-      <span class="platform-name">Craigslist<br><small style="color:#888;font-weight:400">Listing text copied</small></span>
+      <span class="platform-name">Craigslist<br><small style="color:#888;font-weight:400">Opens in browser</small></span>
       <span class="platform-arrow">→</span>
-    </a>
+    </div>
   `;
 
   document.getElementById('postModal').classList.add('active');
@@ -943,24 +1061,124 @@ function closePostModal() {
   currentPostItem = null;
 }
 
-function copyListing() {
-  const text = document.getElementById('listingPreview').textContent;
-  navigator.clipboard.writeText(text).then(() => showToast('Listing copied!')).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    showToast('Listing copied!');
-  });
+// Copy individual fields
+function copyField(field) {
+  let text = '';
+  let btnId = '';
+  if (field === 'title') {
+    text = currentPostItem.name;
+    btnId = 'copyTitleBtn';
+  } else if (field === 'price') {
+    text = currentPostItem.value ? String(currentPostItem.value) : '';
+    btnId = 'copyPriceBtn';
+  } else if (field === 'description') {
+    text = currentListing;
+    btnId = 'copyDescBtn';
+  }
+
+  clipCopy(text);
+  const btn = document.getElementById(btnId);
+  btn.textContent = 'COPIED!';
+  btn.classList.add('copied');
+  showToast(capitalize(field) + ' copied!');
 }
 
-// Auto-copy listing when clicking platform buttons
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('.platform-btn');
-  if (btn && currentPostItem) {
-    const listing = generateListing(currentPostItem);
-    navigator.clipboard.writeText(listing).catch(() => {});
+function clipCopy(text) {
+  try {
+    navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
   }
-});
+}
+
+// Platform deep links - tries native app first, falls back to web
+function launchPlatform(platform) {
+  if (!currentPostItem) return;
+
+  // Copy the full listing to clipboard before launching
+  clipCopy(currentListing);
+
+  // Update steps UI
+  document.getElementById('postStep1').classList.remove('active');
+  document.getElementById('postStep1').classList.add('done');
+  document.getElementById('postStep2').classList.remove('active');
+  document.getElementById('postStep2').classList.add('done');
+  document.getElementById('postStep3').classList.add('active');
+  document.getElementById('pasteReminder').classList.add('show');
+
+  const title = currentPostItem.name;
+  const price = currentPostItem.value || '';
+
+  // Deep link configs: [appSchemeURL, webFallbackURL]
+  const platforms = {
+    ebay: {
+      // eBay app deep link for selling
+      app: 'ebay://sell/create',
+      web: 'https://www.ebay.com/sl/sell?mode=AddItem&title=' + encodeURIComponent(title)
+    },
+    facebook: {
+      // FB app deep link to marketplace sell
+      app: 'fb://marketplace/create/',
+      web: 'https://www.facebook.com/marketplace/create/item/'
+    },
+    offerup: {
+      // OfferUp app deep link
+      app: 'offerup://post',
+      web: 'https://offerup.com/post'
+    },
+    mercari: {
+      // Mercari app deep link
+      app: 'mercari://sell/create',
+      web: 'https://www.mercari.com/sell/'
+    },
+    craigslist: {
+      app: null,
+      web: 'https://post.craigslist.org/'
+    }
+  };
+
+  const config = platforms[platform];
+  if (!config) return;
+
+  showToast('Listing copied! Paste in ' + platform);
+
+  // If no app deep link (craigslist), go straight to web
+  if (!config.app) {
+    window.open(config.web, '_blank');
+    return;
+  }
+
+  // Try native app deep link first
+  // On iOS/Android, if the app is installed it opens; if not we fall back to web
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = config.app;
+  document.body.appendChild(iframe);
+
+  // If app doesn't open within 1.5s, open web version
+  const fallbackTimer = setTimeout(() => {
+    document.body.removeChild(iframe);
+    window.open(config.web, '_blank');
+  }, 1500);
+
+  // If page becomes hidden (app opened), clear the fallback
+  const visHandler = () => {
+    if (document.hidden) {
+      clearTimeout(fallbackTimer);
+      try { document.body.removeChild(iframe); } catch(e) {}
+      document.removeEventListener('visibilitychange', visHandler);
+    }
+  };
+  document.addEventListener('visibilitychange', visHandler);
+
+  // Also try direct window.location for some platforms
+  setTimeout(() => {
+    window.location.href = config.app;
+  }, 100);
+}
 
 // ========== STATS PANEL ==========
 function renderStats() {
