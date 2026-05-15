@@ -531,42 +531,49 @@
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 id="postModalTitle">Post Item</h3>
-    <div class="modal-subtitle" id="postModalSubtitle">Listing generated - pick a platform</div>
+    <div class="modal-subtitle" id="postModalSubtitle">Photo + listing ready to share</div>
 
-    <!-- Step indicator -->
-    <div class="post-steps" id="postSteps">
-      <div class="post-step active" id="postStep1">
-        <div class="step-num">1</div>
-        <div class="step-text">Title copied</div>
-      </div>
-      <div class="step-arrow">→</div>
-      <div class="post-step" id="postStep2">
-        <div class="step-num">2</div>
-        <div class="step-text">Pick platform</div>
-      </div>
-      <div class="step-arrow">→</div>
-      <div class="post-step" id="postStep3">
-        <div class="step-num">3</div>
-        <div class="step-text">Paste & post</div>
-      </div>
+    <!-- Item photo preview in modal -->
+    <div id="postPhotoPreview" style="margin-bottom:12px; text-align:center;">
+      <img id="postPhotoImg" style="max-width:100%; max-height:180px; border-radius:8px; border:1px solid #333; display:none">
+      <div id="postNoPhoto" style="padding:20px; background:#1a1a1a; border-radius:8px; color:#555; font-size:13px; display:none">No photo - add one from Items tab</div>
     </div>
 
-    <!-- Copy buttons for each field -->
+    <!-- Primary action: Share with photo -->
+    <button class="btn btn-primary" onclick="shareWithPhoto()" id="sharePhotoBtn" style="font-size:15px">
+      Share Photo + Listing to Any App
+    </button>
+    <div style="font-size:11px; color:#666; text-align:center; margin-top:4px; margin-bottom:16px">
+      Opens your share sheet - pick FB, OfferUp, Mercari, etc.
+    </div>
+
+    <!-- Save photo to phone -->
+    <button class="btn btn-success btn-sm" onclick="savePhotoToPhone()" id="savePhotoBtn" style="margin-bottom:16px">
+      Save Photo to Camera Roll
+    </button>
+
+    <!-- Divider -->
+    <div style="text-align:center; color:#444; font-size:12px; margin-bottom:12px; position:relative">
+      <span style="background:#141414; padding:0 12px; position:relative; z-index:1">or open a specific platform</span>
+      <div style="position:absolute; top:50%; left:0; right:0; height:1px; background:#333"></div>
+    </div>
+
+    <!-- Copy fields -->
     <div class="copy-fields" id="copyFields">
       <div class="copy-field" onclick="copyField('title')">
         <div class="copy-field-label">TITLE</div>
         <div class="copy-field-value" id="copyTitle"></div>
-        <div class="copy-field-btn" id="copyTitleBtn">TAP TO COPY</div>
+        <div class="copy-field-btn" id="copyTitleBtn">COPY</div>
       </div>
       <div class="copy-field" onclick="copyField('price')">
         <div class="copy-field-label">PRICE</div>
         <div class="copy-field-value" id="copyPrice"></div>
-        <div class="copy-field-btn" id="copyPriceBtn">TAP TO COPY</div>
+        <div class="copy-field-btn" id="copyPriceBtn">COPY</div>
       </div>
       <div class="copy-field" onclick="copyField('description')">
-        <div class="copy-field-label">DESCRIPTION</div>
-        <div class="copy-field-value" id="copyDesc" style="max-height:60px;overflow:hidden"></div>
-        <div class="copy-field-btn" id="copyDescBtn">TAP TO COPY</div>
+        <div class="copy-field-label">DESC</div>
+        <div class="copy-field-value" id="copyDesc" style="max-height:40px;overflow:hidden"></div>
+        <div class="copy-field-btn" id="copyDescBtn">COPY</div>
       </div>
     </div>
 
@@ -574,7 +581,7 @@
 
     <!-- Paste reminder banner -->
     <div class="paste-reminder" id="pasteReminder">
-      Listing info copied! Paste it in the app.
+      Listing copied! Paste in the app. Photo saved to your camera roll.
     </div>
 
     <button class="btn btn-secondary" onclick="closePostModal()" style="margin-top:12px">Close</button>
@@ -992,6 +999,17 @@ function generateListing(item) {
 let currentPostItem = null;
 let currentListing = '';
 
+// Convert base64 data URL to a File object
+function dataURLtoFile(dataUrl, filename) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new File([u8arr], filename, { type: mime });
+}
+
 function openPostModal(id) {
   const items = getItems();
   const item = items.find(i => i.id === id);
@@ -1000,55 +1018,63 @@ function openPostModal(id) {
   currentListing = generateListing(item);
 
   document.getElementById('postModalTitle').textContent = 'Post: ' + item.name;
-  document.getElementById('postModalSubtitle').textContent = item.value ? 'Listed at $' + item.value : 'No price set';
+  document.getElementById('postModalSubtitle').textContent = item.photo
+    ? 'Photo + listing ready to share'
+    : 'Listing ready (no photo)';
+
+  // Show photo preview
+  const photoImg = document.getElementById('postPhotoImg');
+  const noPhoto = document.getElementById('postNoPhoto');
+  if (item.photo) {
+    photoImg.src = item.photo;
+    photoImg.style.display = 'inline-block';
+    noPhoto.style.display = 'none';
+    document.getElementById('sharePhotoBtn').textContent = 'Share Photo + Listing to Any App';
+    document.getElementById('savePhotoBtn').style.display = '';
+  } else {
+    photoImg.style.display = 'none';
+    noPhoto.style.display = 'block';
+    document.getElementById('sharePhotoBtn').textContent = 'Share Listing to Any App';
+    document.getElementById('savePhotoBtn').style.display = 'none';
+  }
 
   // Fill copy fields
   document.getElementById('copyTitle').textContent = item.name;
-  document.getElementById('copyPrice').textContent = item.value ? '$' + item.value : 'No price set';
+  document.getElementById('copyPrice').textContent = item.value ? '$' + item.value : 'Make an offer';
   document.getElementById('copyDesc').textContent = currentListing;
 
   // Reset copy button states
   document.querySelectorAll('.copy-field-btn').forEach(b => {
     b.classList.remove('copied');
-    b.textContent = 'TAP TO COPY';
-  });
-
-  // Reset steps
-  document.querySelectorAll('.post-step').forEach((s, i) => {
-    s.classList.toggle('active', i === 0);
-    s.classList.remove('done');
+    b.textContent = 'COPY';
   });
   document.getElementById('pasteReminder').classList.remove('show');
 
-  // Build platform buttons with deep links
-  // On mobile, these try to open the native app first, fall back to web
-  const encodedTitle = encodeURIComponent(item.name);
-  const price = item.value || '';
-
+  // Build platform buttons
   document.getElementById('platformButtons').innerHTML = `
     <div class="platform-btn ebay" onclick="launchPlatform('ebay')">
       <span class="platform-icon">🏷️</span>
-      <span class="platform-name">eBay<br><small style="color:#888;font-weight:400">Opens app → Create Listing</small></span>
+      <span class="platform-name">eBay<br><small style="color:#888;font-weight:400">Saves photo + opens app</small></span>
       <span class="platform-arrow">→</span>
     </div>
     <div class="platform-btn facebook" onclick="launchPlatform('facebook')">
       <span class="platform-icon">📘</span>
-      <span class="platform-name">Facebook Marketplace<br><small style="color:#888;font-weight:400">Opens app → Sell tab</small></span>
+      <span class="platform-name">Facebook Marketplace<br><small style="color:#888;font-weight:400">Saves photo + opens app</small></span>
       <span class="platform-arrow">→</span>
     </div>
     <div class="platform-btn offerup" onclick="launchPlatform('offerup')">
       <span class="platform-icon">🟢</span>
-      <span class="platform-name">OfferUp<br><small style="color:#888;font-weight:400">Opens app → Post item</small></span>
+      <span class="platform-name">OfferUp<br><small style="color:#888;font-weight:400">Saves photo + opens app</small></span>
       <span class="platform-arrow">→</span>
     </div>
     <div class="platform-btn mercari" onclick="launchPlatform('mercari')">
       <span class="platform-icon">🔴</span>
-      <span class="platform-name">Mercari<br><small style="color:#888;font-weight:400">Opens app → Sell</small></span>
+      <span class="platform-name">Mercari<br><small style="color:#888;font-weight:400">Saves photo + opens app</small></span>
       <span class="platform-arrow">→</span>
     </div>
     <div class="platform-btn craigslist" onclick="launchPlatform('craigslist')">
       <span class="platform-icon">🟣</span>
-      <span class="platform-name">Craigslist<br><small style="color:#888;font-weight:400">Opens in browser</small></span>
+      <span class="platform-name">Craigslist<br><small style="color:#888;font-weight:400">Saves photo + opens browser</small></span>
       <span class="platform-arrow">→</span>
     </div>
   `;
@@ -1061,7 +1087,80 @@ function closePostModal() {
   currentPostItem = null;
 }
 
-// Copy individual fields
+// ===== SHARE WITH PHOTO (native share sheet) =====
+async function shareWithPhoto() {
+  if (!currentPostItem) return;
+
+  const listing = currentListing;
+  const shareData = {
+    title: currentPostItem.name,
+    text: listing
+  };
+
+  // If item has a photo, attach it as a file
+  if (currentPostItem.photo) {
+    try {
+      const fileName = currentPostItem.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30) + '.jpg';
+      const file = dataURLtoFile(currentPostItem.photo, fileName);
+
+      // Check if browser supports sharing files
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+    } catch (e) {
+      console.log('File share not supported, sharing text only');
+    }
+  }
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+      showToast('Shared!');
+    } else {
+      // Fallback: copy listing text
+      clipCopy(listing);
+      showToast('Share not supported - listing copied to clipboard');
+    }
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      clipCopy(listing);
+      showToast('Listing copied to clipboard');
+    }
+  }
+}
+
+// ===== SAVE PHOTO TO PHONE =====
+function savePhotoToPhone() {
+  if (!currentPostItem || !currentPostItem.photo) {
+    showToast('No photo to save');
+    return;
+  }
+
+  const fileName = currentPostItem.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30) + '.jpg';
+
+  // Method 1: Try using share API to save (works well on iOS - "Save Image" option)
+  if (navigator.canShare) {
+    try {
+      const file = dataURLtoFile(currentPostItem.photo, fileName);
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: 'Save photo'
+        }).catch(() => {});
+        return;
+      }
+    } catch (e) {}
+  }
+
+  // Method 2: Trigger download (saves to Downloads/Files on iOS, Gallery on Android)
+  const link = document.createElement('a');
+  link.href = currentPostItem.photo;
+  link.download = fileName;
+  link.click();
+  showToast('Photo saved! Check Downloads/Photos');
+}
+
+// ===== COPY INDIVIDUAL FIELDS =====
 function copyField(field) {
   let text = '';
   let btnId = '';
@@ -1094,43 +1193,43 @@ function clipCopy(text) {
   }
 }
 
-// Platform deep links - tries native app first, falls back to web
-function launchPlatform(platform) {
+// ===== PLATFORM LAUNCH (save photo first, then open app) =====
+async function launchPlatform(platform) {
   if (!currentPostItem) return;
 
-  // Copy the full listing to clipboard before launching
+  // Step 1: Copy listing text to clipboard
   clipCopy(currentListing);
 
-  // Update steps UI
-  document.getElementById('postStep1').classList.remove('active');
-  document.getElementById('postStep1').classList.add('done');
-  document.getElementById('postStep2').classList.remove('active');
-  document.getElementById('postStep2').classList.add('done');
-  document.getElementById('postStep3').classList.add('active');
+  // Step 2: Save photo to phone so it's in their camera roll for the app
+  if (currentPostItem.photo) {
+    const fileName = currentPostItem.name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30) + '.jpg';
+    const link = document.createElement('a');
+    link.href = currentPostItem.photo;
+    link.download = fileName;
+    link.click();
+  }
+
+  // Step 3: Show reminder
   document.getElementById('pasteReminder').classList.add('show');
 
   const title = currentPostItem.name;
   const price = currentPostItem.value || '';
 
-  // Deep link configs: [appSchemeURL, webFallbackURL]
+  // Platform configs
   const platforms = {
     ebay: {
-      // eBay app deep link for selling
       app: 'ebay://sell/create',
       web: 'https://www.ebay.com/sl/sell?mode=AddItem&title=' + encodeURIComponent(title)
     },
     facebook: {
-      // FB app deep link to marketplace sell
       app: 'fb://marketplace/create/',
       web: 'https://www.facebook.com/marketplace/create/item/'
     },
     offerup: {
-      // OfferUp app deep link
       app: 'offerup://post',
       web: 'https://offerup.com/post'
     },
     mercari: {
-      // Mercari app deep link
       app: 'mercari://sell/create',
       web: 'https://www.mercari.com/sell/'
     },
@@ -1143,41 +1242,31 @@ function launchPlatform(platform) {
   const config = platforms[platform];
   if (!config) return;
 
-  showToast('Listing copied! Paste in ' + platform);
+  showToast('Photo saved + listing copied!');
 
-  // If no app deep link (craigslist), go straight to web
+  // If no app deep link, go straight to web
   if (!config.app) {
     window.open(config.web, '_blank');
     return;
   }
 
-  // Try native app deep link first
-  // On iOS/Android, if the app is installed it opens; if not we fall back to web
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = config.app;
-  document.body.appendChild(iframe);
-
-  // If app doesn't open within 1.5s, open web version
-  const fallbackTimer = setTimeout(() => {
-    document.body.removeChild(iframe);
-    window.open(config.web, '_blank');
-  }, 1500);
-
-  // If page becomes hidden (app opened), clear the fallback
+  // Try native app deep link, fall back to web
+  let appOpened = false;
   const visHandler = () => {
-    if (document.hidden) {
-      clearTimeout(fallbackTimer);
-      try { document.body.removeChild(iframe); } catch(e) {}
-      document.removeEventListener('visibilitychange', visHandler);
-    }
+    if (document.hidden) { appOpened = true; }
   };
   document.addEventListener('visibilitychange', visHandler);
 
-  // Also try direct window.location for some platforms
+  // Try the app scheme
+  window.location.href = config.app;
+
+  // If app doesn't open in 1.5s, open web
   setTimeout(() => {
-    window.location.href = config.app;
-  }, 100);
+    document.removeEventListener('visibilitychange', visHandler);
+    if (!appOpened) {
+      window.open(config.web, '_blank');
+    }
+  }, 1500);
 }
 
 // ========== STATS PANEL ==========
