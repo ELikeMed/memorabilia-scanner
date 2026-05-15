@@ -592,6 +592,134 @@
 
 <script>
 const DB_KEY = 'memorabilia_items';
+const IDB_NAME = 'memorabilia_db';
+const IDB_STORE = 'items';
+let dbReady = false;
+let idb = null;
+
+// ========== IndexedDB (unlimited storage) ==========
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = (e) => { idb = e.target.result; dbReady = true; resolve(idb); };
+    req.onerror = (e) => { console.error('IDB error', e); reject(e); };
+  });
+}
+
+// Migrate existing localStorage data to IndexedDB (one-time)
+async function migrateFromLocalStorage() {
+  const raw = localStorage.getItem(DB_KEY);
+  if (!raw) return;
+  try {
+    const items = JSON.parse(raw);
+    if (!items.length) return;
+    const db = idb || await openIDB();
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    const store = tx.objectStore(IDB_STORE);
+    // Check if IDB already has data
+    const countReq = store.count();
+    countReq.onsuccess = () => {
+      if (countReq.result === 0) {
+        // Move all items from localStorage to IDB
+        items.forEach(item => store.put(item));
+        tx.oncomplete = () => {
+          localStorage.removeItem(DB_KEY);
+          console.log('Migrated ' + items.length + ' items from localStorage to IndexedDB');
+        };
+      } else {
+        // IDB already has data, just clear localStorage to free space
+        localStorage.removeItem(DB_KEY);
+      }
+    };
+  } catch (e) {
+    console.error('Migration error', e);
+  }
+}
+
+async function getItemsAsync() {
+  const db = idb || await openIDB();
+  return new Promise((resolve) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const store = tx.objectStore(IDB_STORE);
+    const req = store.getAll();
+    req.onsuccess = () => {
+      // Sort by created date descending (newest first)
+      const items = req.result.sort((a, b) => new Date(b.created) - new Date(a.created));
+      resolve(items);
+    };
+    req.onerror = () => resolve([]);
+  });
+}
+
+async function saveItemAsync(item) {
+  const db = idb || await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(item);
+    tx.oncomplete = () => resolve();
+    tx.onerror = (e) => reject(e);
+  });
+}
+
+async function deleteItemAsync(id) {
+  const db = idb || await openIDB();
+  return new Promise((resolve) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+    tx.oncomplete = () => resolve();
+  });
+}
+
+async function clearAllAsync() {
+  const db = idb || await openIDB();
+  return new Promise((resolve) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).clear();
+    tx.oncomplete = () => resolve();
+  });
+}
+
+// Sync wrappers - keep items cached in memory for fast reads
+let _itemsCache = [];
+let _cacheLoaded = false;
+
+function getItems() {
+  return _itemsCache;
+}
+
+async function loadItems() {
+  _itemsCache = await getItemsAsync();
+  _cacheLoaded = true;
+  updateStats();
+  return _itemsCache;
+}
+
+async function addItem(item) {
+  await saveItemAsync(item);
+  _itemsCache.unshift(item);
+  updateStats();
+}
+
+async function removeItem(id) {
+  await deleteItemAsync(id);
+  _itemsCache = _itemsCache.filter(i => i.id !== id);
+  updateStats();
+}
+
+async function updateItem(id, updates) {
+  const idx = _itemsCache.findIndex(i => i.id === id);
+  if (idx >= 0) {
+    Object.assign(_itemsCache[idx], updates);
+    await saveItemAsync(_itemsCache[idx]);
+    updateStats();
+  }
+}
 
 // ========== PRICE ESTIMATE ENGINE ==========
 const PRICE_RANGES = {
@@ -681,15 +809,8 @@ function useEstimate() {
   }
 }
 
-// ========== CORE DATA ==========
-function getItems() {
-  try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
-  catch { return []; }
-}
-function saveItems(items) {
-  localStorage.setItem(DB_KEY, JSON.stringify(items));
-  updateStats();
-}
+// ========== CORE DATA (uses IndexedDB via cache) ==========
+// getItems() is defined above - returns _itemsCache synchronously
 
 function updateStats() {
   const items = getItems();
@@ -717,12 +838,12 @@ function processPhoto(file, callback) {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const maxW = 800;
+      const maxW = 600;
       const scale = Math.min(1, maxW / img.width);
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      callback(canvas.toDataURL('image/jpeg', 0.7));
+      callback(canvas.toDataURL('image/jpeg', 0.6));
     };
     img.src = e.target.result;
   };
@@ -751,7 +872,7 @@ function selectCondition(el) {
 }
 
 // ========== SAVE ITEM ==========
-function saveItem() {
+async function saveItem() {
   const name = document.getElementById('itemName').value.trim();
   if (!name) { showToast('Enter an item name'); return; }
 
@@ -773,11 +894,14 @@ function saveItem() {
     estimate: est, created: new Date().toISOString()
   };
 
-  const items = getItems();
-  items.unshift(item);
-  saveItems(items);
-  clearForm();
-  showToast('Item saved! Est: $' + (est ? est.low + '-' + est.high : '?'));
+  try {
+    await addItem(item);
+    clearForm();
+    showToast('Item saved! Est: $' + (est ? est.low + '-' + est.high : '?'));
+  } catch (e) {
+    console.error('Save error', e);
+    showToast('Error saving - try again');
+  }
 }
 
 function clearForm() {
@@ -832,7 +956,7 @@ function handleRapidPhoto(input) {
   });
 }
 
-function saveRapidItem() {
+async function saveRapidItem() {
   if (!rfPhoto) return;
   const name = document.getElementById('rfItemName').value.trim() || 'Unnamed Item #' + (getItems().length + 1);
   const catEl = document.querySelector('#rfCategoryTags .tag.selected');
@@ -846,9 +970,7 @@ function saveRapidItem() {
     estimate: est, created: new Date().toISOString()
   };
 
-  const items = getItems();
-  items.unshift(item);
-  saveItems(items);
+  await addItem(item);
 
   rfSessionCount++;
   document.getElementById('rfCount').textContent = rfSessionCount + ' snapped';
@@ -961,18 +1083,17 @@ function searchGoogle(query) {
   window.open('https://www.google.com/search?q=' + encodeURIComponent(query + ' value price'), '_blank');
 }
 
-function updateValue(id) {
+async function updateValue(id) {
   const input = document.getElementById('val-' + id);
   const val = parseFloat(input.value) || 0;
-  const items = getItems();
-  const idx = items.findIndex(i => i.id === id);
-  if (idx >= 0) { items[idx].value = val; saveItems(items); renderItems(); showToast('Value updated'); }
+  await updateItem(id, { value: val });
+  renderItems();
+  showToast('Value updated');
 }
 
-function deleteItem(id) {
+async function deleteItem(id) {
   if (!confirm('Delete this item?')) return;
-  const items = getItems().filter(i => i.id !== id);
-  saveItems(items);
+  await removeItem(id);
   renderItems();
   renderFilterChips();
   showToast('Item deleted');
@@ -1412,10 +1533,11 @@ function shareList() {
   }
 }
 
-function clearAll() {
+async function clearAll() {
   if (!confirm('Delete ALL items? This cannot be undone.')) return;
   if (!confirm('Are you really sure?')) return;
-  localStorage.removeItem(DB_KEY);
+  await clearAllAsync();
+  _itemsCache = [];
   updateStats();
   renderItems();
   showToast('All items cleared');
@@ -1428,8 +1550,13 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// Init
-updateStats();
+// Init - open IndexedDB, migrate from localStorage, load items
+(async function init() {
+  await openIDB();
+  await migrateFromLocalStorage();
+  await loadItems();
+  updateStats();
+})();
 </script>
 </body>
 </html>
