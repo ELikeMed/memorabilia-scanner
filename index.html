@@ -590,135 +590,166 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Sync status indicator -->
+<div id="syncStatus" style="position:fixed;top:4px;right:8px;z-index:200;font-size:10px;color:#4caf50;opacity:0.7">
+  <span id="syncDot" style="display:inline-block;width:8px;height:8px;background:#4caf50;border-radius:50%;margin-right:4px;vertical-align:middle"></span>
+  <span id="syncText">Synced</span>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
-const DB_KEY = 'memorabilia_items';
-const IDB_NAME = 'memorabilia_db';
-const IDB_STORE = 'items';
-let dbReady = false;
-let idb = null;
+// ========== FIREBASE CONFIG ==========
+firebase.initializeApp({
+  projectId: "memorabilia-scanner",
+  appId: "1:921673546049:web:f27edc9860b9083700c9c0",
+  storageBucket: "memorabilia-scanner.firebasestorage.app",
+  apiKey: "AIzaSyC8aN2exxZ-KyrcpGF68su6MLM9VL1tzYM",
+  authDomain: "memorabilia-scanner.firebaseapp.com",
+  messagingSenderId: "921673546049"
+});
 
-// ========== IndexedDB (unlimited storage) ==========
-function openIDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(IDB_NAME, 1);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(IDB_STORE)) {
-        db.createObjectStore(IDB_STORE, { keyPath: 'id' });
-      }
-    };
-    req.onsuccess = (e) => { idb = e.target.result; dbReady = true; resolve(idb); };
-    req.onerror = (e) => { console.error('IDB error', e); reject(e); };
-  });
-}
+const db = firebase.firestore();
+// Enable offline persistence so app works without internet
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+  console.log('Persistence error:', err.code);
+});
+const itemsCollection = db.collection('items');
 
-// Migrate existing localStorage data to IndexedDB (one-time)
-async function migrateFromLocalStorage() {
-  const raw = localStorage.getItem(DB_KEY);
-  if (!raw) return;
-  try {
-    const items = JSON.parse(raw);
-    if (!items.length) return;
-    const db = idb || await openIDB();
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    const store = tx.objectStore(IDB_STORE);
-    // Check if IDB already has data
-    const countReq = store.count();
-    countReq.onsuccess = () => {
-      if (countReq.result === 0) {
-        // Move all items from localStorage to IDB
-        items.forEach(item => store.put(item));
-        tx.oncomplete = () => {
-          localStorage.removeItem(DB_KEY);
-          console.log('Migrated ' + items.length + ' items from localStorage to IndexedDB');
-        };
-      } else {
-        // IDB already has data, just clear localStorage to free space
-        localStorage.removeItem(DB_KEY);
-      }
-    };
-  } catch (e) {
-    console.error('Migration error', e);
-  }
-}
-
-async function getItemsAsync() {
-  const db = idb || await openIDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(IDB_STORE, 'readonly');
-    const store = tx.objectStore(IDB_STORE);
-    const req = store.getAll();
-    req.onsuccess = () => {
-      // Sort by created date descending (newest first)
-      const items = req.result.sort((a, b) => new Date(b.created) - new Date(a.created));
-      resolve(items);
-    };
-    req.onerror = () => resolve([]);
-  });
-}
-
-async function saveItemAsync(item) {
-  const db = idb || await openIDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).put(item);
-    tx.oncomplete = () => resolve();
-    tx.onerror = (e) => reject(e);
-  });
-}
-
-async function deleteItemAsync(id) {
-  const db = idb || await openIDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).delete(id);
-    tx.oncomplete = () => resolve();
-  });
-}
-
-async function clearAllAsync() {
-  const db = idb || await openIDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).clear();
-    tx.oncomplete = () => resolve();
-  });
-}
-
-// Sync wrappers - keep items cached in memory for fast reads
+// ========== REAL-TIME DATA LAYER ==========
 let _itemsCache = [];
-let _cacheLoaded = false;
 
 function getItems() {
   return _itemsCache;
 }
 
-async function loadItems() {
-  _itemsCache = await getItemsAsync();
-  _cacheLoaded = true;
-  updateStats();
-  return _itemsCache;
+// Real-time listener - automatically syncs all devices
+function startRealtimeSync() {
+  itemsCollection.orderBy('created', 'desc').onSnapshot(
+    { includeMetadataChanges: true },
+    (snapshot) => {
+      _itemsCache = snapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+      updateStats();
+
+      // Update sync indicator
+      const hasPending = snapshot.metadata.hasPendingWrites;
+      const fromCache = snapshot.metadata.fromCache;
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      if (hasPending) {
+        dot.style.background = '#ff9800';
+        text.textContent = 'Saving...';
+      } else if (fromCache) {
+        dot.style.background = '#f44336';
+        text.textContent = 'Offline';
+      } else {
+        dot.style.background = '#4caf50';
+        text.textContent = 'Synced';
+      }
+
+      // Re-render if on items/stats/export tab
+      const activePanel = document.querySelector('.panel.active');
+      if (activePanel) {
+        const id = activePanel.id;
+        if (id === 'panel-items') { renderFilterChips(); renderItems(); }
+        if (id === 'panel-stats') renderStats();
+        if (id === 'panel-export') renderExport();
+      }
+    },
+    (error) => {
+      console.error('Firestore sync error:', error);
+      document.getElementById('syncDot').style.background = '#f44336';
+      document.getElementById('syncText').textContent = 'Error';
+    }
+  );
 }
 
 async function addItem(item) {
-  await saveItemAsync(item);
-  _itemsCache.unshift(item);
-  updateStats();
+  // Use the item's id as the document ID for consistency
+  const docId = String(item.id);
+  await itemsCollection.doc(docId).set(item);
+  // Cache updates automatically via onSnapshot
 }
 
 async function removeItem(id) {
-  await deleteItemAsync(id);
-  _itemsCache = _itemsCache.filter(i => i.id !== id);
-  updateStats();
+  const docId = String(id);
+  await itemsCollection.doc(docId).delete();
 }
 
 async function updateItem(id, updates) {
-  const idx = _itemsCache.findIndex(i => i.id === id);
-  if (idx >= 0) {
-    Object.assign(_itemsCache[idx], updates);
-    await saveItemAsync(_itemsCache[idx]);
-    updateStats();
+  const docId = String(id);
+  await itemsCollection.doc(docId).update(updates);
+}
+
+async function clearAllAsync() {
+  // Delete all docs in batches
+  const snapshot = await itemsCollection.get();
+  const batch = db.batch();
+  snapshot.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+}
+
+// Migrate existing IndexedDB/localStorage data to Firebase (one-time)
+async function migrateToFirebase() {
+  const DB_KEY = 'memorabilia_items';
+  const IDB_NAME = 'memorabilia_db';
+  const IDB_STORE = 'items';
+
+  // Check localStorage first
+  let localItems = [];
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) localItems = JSON.parse(raw);
+  } catch(e) {}
+
+  // Check IndexedDB
+  let idbItems = [];
+  try {
+    idbItems = await new Promise((resolve) => {
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        e.target.result.createObjectStore(IDB_STORE, { keyPath: 'id' });
+      };
+      req.onsuccess = (e) => {
+        const idb = e.target.result;
+        if (!idb.objectStoreNames.contains(IDB_STORE)) { resolve([]); return; }
+        const tx = idb.transaction(IDB_STORE, 'readonly');
+        const store = tx.objectStore(IDB_STORE);
+        const getAll = store.getAll();
+        getAll.onsuccess = () => resolve(getAll.result || []);
+        getAll.onerror = () => resolve([]);
+      };
+      req.onerror = () => resolve([]);
+    });
+  } catch(e) {}
+
+  // Combine, preferring IDB items (more recent)
+  const allItems = idbItems.length > 0 ? idbItems : localItems;
+  if (allItems.length === 0) return;
+
+  // Check if Firebase already has items
+  const existing = await itemsCollection.limit(1).get();
+  if (!existing.empty) {
+    console.log('Firebase already has data, skipping migration');
+    // Clean up local storage
+    localStorage.removeItem(DB_KEY);
+    return;
   }
+
+  console.log('Migrating ' + allItems.length + ' items to Firebase...');
+  const batch = db.batch();
+  allItems.forEach(item => {
+    const docRef = itemsCollection.doc(String(item.id));
+    batch.set(docRef, item);
+  });
+  await batch.commit();
+  console.log('Migration complete!');
+
+  // Clean up local storage
+  localStorage.removeItem(DB_KEY);
+  try { indexedDB.deleteDatabase(IDB_NAME); } catch(e) {}
 }
 
 // ========== PRICE ESTIMATE ENGINE ==========
@@ -1550,12 +1581,14 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// Init - open IndexedDB, migrate from localStorage, load items
+// Init - migrate old data to Firebase, start real-time sync
 (async function init() {
-  await openIDB();
-  await migrateFromLocalStorage();
-  await loadItems();
-  updateStats();
+  try {
+    await migrateToFirebase();
+  } catch(e) {
+    console.log('Migration skipped:', e);
+  }
+  startRealtimeSync();
 })();
 </script>
 </body>

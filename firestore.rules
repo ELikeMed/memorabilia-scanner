@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Items collection - anyone with the app can read/write
+    // Simple open access for the team on-site
+    match /items/{itemId} {
+      allow read, write: if true;
+    }
+  }
+}
